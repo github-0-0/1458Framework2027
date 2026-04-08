@@ -1,0 +1,48 @@
+package org.redtierobotics.lib.subsystembases;
+
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.units.measure.MutTime;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+import org.redtierobotics.lib.io.IO;
+import org.redtierobotics.lib.io.Inputs;
+
+public class LoggedSubsystemBase<
+				I extends Inputs,
+				A extends Inputs & LoggableInputs,
+				O extends IO<I>,
+				C extends SubsystemConstants>
+		extends SubsystemBase {
+	protected A inputs;
+	protected O io;
+	protected C constants;
+
+	protected String name;
+
+	public LoggedSubsystemBase(A inputs, O io, C constants) {
+		super();
+		name = getName();
+		this.inputs = inputs;
+		this.io = io;
+		this.constants = constants;
+
+		io.setSubsystemName(getName());
+	}
+
+	private MutTime latency = Seconds.mutable(0.0);
+
+	@Override
+	public void periodic() {
+		double timestamp = Timer.getFPGATimestamp();
+		io.readInputs((I) inputs); // java warcrime
+		Logger.processInputs(getName(), inputs);
+		Logger.recordOutput(
+				getName() + "/currentCommand",
+				(getCurrentCommand() == null) ? "Default" : getCurrentCommand().getName());
+		latency.mut_setMagnitude(Timer.getFPGATimestamp() - timestamp);
+		Logger.recordOutput(getName() + "/latency", latency);
+	}
+}
