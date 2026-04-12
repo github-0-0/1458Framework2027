@@ -12,9 +12,9 @@ import java.util.function.Supplier;
 public class CtreUtil {
 	public static final int MAX_RETRIES = 10;
 
-	public static StatusCode tryUntilOK(Supplier<StatusCode> function, int deviceId) {
+	public static StatusCode tryUntilOk(int max, Supplier<StatusCode> function, int deviceId) {
 		StatusCode statusCode = StatusCode.OK;
-		for (int i = 0; i < MAX_RETRIES; i++) {
+		for (int i = 0; i < max; i++) {
 			statusCode = function.get();
 			if (statusCode == StatusCode.OK) {
 				break;
@@ -27,8 +27,12 @@ public class CtreUtil {
 		return statusCode;
 	}
 
+	public static StatusCode tryUntilOk(Supplier<StatusCode> function, int deviceId) {
+		return tryUntilOk(MAX_RETRIES, function, deviceId);
+	}
+
 	public static StatusCode applyConfiguration(TalonFX motor, TalonFXConfiguration config) {
-		return tryUntilOK(() -> motor.getConfigurator().apply(config), motor.getDeviceID());
+		return tryUntilOk(() -> motor.getConfigurator().apply(config), motor.getDeviceID());
 	}
 
 	public static StatusCode applyConfigurationNonBlocking(TalonFX motor, VoltageConfigs config) {
@@ -36,10 +40,10 @@ public class CtreUtil {
 	}
 
 	public static StatusCode refreshConfiguration(TalonFX motor, TalonFXConfiguration config) {
-		return tryUntilOK(() -> motor.getConfigurator().refresh(config), motor.getDeviceID());
+		return tryUntilOk(() -> motor.getConfigurator().refresh(config), motor.getDeviceID());
 	}
 
 	public static StatusCode applyFollower(int main, TalonFX motor, MotorAlignmentValue value) {
-		return tryUntilOK(() -> motor.setControl(new Follower(main, value)), motor.getDeviceID());
+		return tryUntilOk(() -> motor.setControl(new Follower(main, value)), motor.getDeviceID());
 	}
 }

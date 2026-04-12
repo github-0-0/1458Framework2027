@@ -32,7 +32,6 @@ public class InterpolationUtil {
 					// Apply the scaled twist to this pose and return the result
 					return startValue.exp(scaledTwist);
 				}
-				;
 			};
 
 	public static Interpolator<Translation2d> translationInterpolator =
@@ -49,6 +48,5 @@ public class InterpolationUtil {
 					double newY = startValue.getY() + t * (endValue.getY() - startValue.getY());
 					return new Translation2d(newX, newY);
 				}
-				;
 			};
 }

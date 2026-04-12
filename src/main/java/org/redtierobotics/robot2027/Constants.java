@@ -15,5 +15,6 @@ package org.redtierobotics.robot2027;
 public final class Constants {
 	public static class OperatorConstants {
 		public static final int CONTROLLER_PORT = 0;
+		public static final double EPSILON = 0.07;
 	}
 }

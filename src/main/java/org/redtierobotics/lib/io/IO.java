@@ -1,7 +1,9 @@
 package org.redtierobotics.lib.io;
 
-public interface IO<I extends Inputs> {
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+
+public interface IO<I extends Inputs & LoggableInputs> {
 	void readInputs(I inputs);
 
-	void setSubsystemName(String name);
+	void setLoggingKey(String name);
 }

@@ -10,10 +10,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import java.util.Optional;
 
 public class TrajectoryLoader {
-	public static final RobotConfig config = null;
+	public final RobotConfig config;
 
-	/** Static class */
-	private TrajectoryLoader() {}
+	public TrajectoryLoader(RobotConfig config) {
+		this.config = config;
+	}
 
 	/**
 	 * Loads a trajectory from the deploy directory.
@@ -22,11 +23,10 @@ public class TrajectoryLoader {
 	 * @param fileName The file name (without the extension).
 	 * @return The trajectory.
 	 */
-	public static Optional<RedTrajectory> loadAutoTrajectory(
+	public Optional<RedTrajectory> loadAutoTrajectory(
 			RedTrajectory.TrajectoryType type, String fileName) {
 		switch (type) {
 			case CHOREO:
-				// This is such a monstrosity but i can live with it
 				Optional<? extends Trajectory<?>> load = Choreo.loadTrajectory(fileName);
 				if (load.isPresent()) {
 					Trajectory<?> trajectory = load.get();

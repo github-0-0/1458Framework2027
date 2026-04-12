@@ -79,8 +79,12 @@ public class ProfiledPIDVController {
 
 	/** Gets the current error */
 	public double getError() {
-		return MathUtil.inputModulus(
-				goal.position - controller.positionMeasurement, controller.minRange, controller.maxRange);
+		if (controller.isContinuous) {
+			return MathUtil.inputModulus(
+					goal.position - controller.positionMeasurement, controller.minRange, controller.maxRange);
+		} else {
+			return goal.position - controller.positionMeasurement;
+		}
 	}
 
 	/** Resets the controller. */

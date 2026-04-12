@@ -24,11 +24,12 @@ import edu.wpi.first.units.measure.Voltage;
 import java.util.List;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import org.redtierobotics.lib.io.motor.MotorIO;
 import org.redtierobotics.lib.util.CanDevice;
 import org.redtierobotics.lib.util.CtreUtil;
 
-public class TalonFXMotorIO implements MotorIO<TalonFXInputs> {
+public class TalonFXMotorIO implements MotorIO<TalonFXInputsAutoLogged> {
 	protected final DutyCycleOut dutyCycleControl = new DutyCycleOut(0.0);
 	protected final VelocityVoltage velocityVoltageControl = new VelocityVoltage(0.0);
 	protected final VoltageOut voltageControl = new VoltageOut(0.0);
@@ -55,6 +56,14 @@ public class TalonFXMotorIO implements MotorIO<TalonFXInputs> {
 
 	protected String name = "";
 
+	protected LoggedNetworkNumber p;
+	protected LoggedNetworkNumber i;
+	protected LoggedNetworkNumber d;
+	protected LoggedNetworkNumber v;
+	protected LoggedNetworkNumber s;
+	protected LoggedNetworkNumber a;
+	protected LoggedNetworkNumber g;
+
 	public TalonFXMotorIO(CanDevice device, TalonFXConfiguration config) {
 		motor = new TalonFX(device.id(), device.bus());
 		this.config = config;
@@ -80,7 +89,7 @@ public class TalonFXMotorIO implements MotorIO<TalonFXInputs> {
 	}
 
 	@Override
-	public void readInputs(TalonFXInputs inputs) {
+	public void readInputs(TalonFXInputsAutoLogged inputs) {
 		BaseStatusSignal.refreshAll(signals);
 
 		inputs.position.mut_replace(positionSignal.getValue());
@@ -167,17 +176,40 @@ public class TalonFXMotorIO implements MotorIO<TalonFXInputs> {
 
 	@Override
 	public void resetPosition(Angle position) {
-		CtreUtil.tryUntilOK(() -> motor.setPosition(position), motor.getDeviceID());
+		CtreUtil.tryUntilOk(() -> motor.setPosition(position), motor.getDeviceID());
 		Logger.recordOutput(name + "/LastResetPosition", position);
 	}
 
 	@Override
-	public void setSubsystemName(String name) {
+	public void setLoggingKey(String name) {
 		this.name = name;
+		p = new LoggedNetworkNumber("Tuning/" + name + "/Gains/P", config.Slot0.kP);
+		i = new LoggedNetworkNumber("Tuning/" + name + "/Gains/I", config.Slot0.kI);
+		d = new LoggedNetworkNumber("Tuning/" + name + "/Gains/D", config.Slot0.kD);
+		v = new LoggedNetworkNumber("Tuning/" + name + "/Gains/V", config.Slot0.kV);
+		s = new LoggedNetworkNumber("Tuning/" + name + "/Gains/S", config.Slot0.kS);
+		a = new LoggedNetworkNumber("Tuning/" + name + "/Gains/A", config.Slot0.kA);
+		g = new LoggedNetworkNumber("Tuning/" + name + "/Gains/G", config.Slot0.kG);
 	}
 
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	public void setGainsSlot0(double p, double i, double d, double v, double s, double a, double g) {
+		config.Slot0.withKP(p).withKI(i).withKD(d).withKV(v).withKS(s).withKA(a).withKG(g);
+		CtreUtil.applyConfiguration(motor, config);
+	}
+
+	public void tuneGains() {
+		setGainsSlot0(
+				p.getAsDouble(),
+				i.getAsDouble(),
+				d.getAsDouble(),
+				v.getAsDouble(),
+				s.getAsDouble(),
+				a.getAsDouble(),
+				g.getAsDouble());
 	}
 }

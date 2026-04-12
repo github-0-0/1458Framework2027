@@ -9,9 +9,10 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
 import org.redtierobotics.lib.io.IO;
 
-public interface MotorIO<I extends MotorInputs> extends IO<I> {
+public interface MotorIO<I extends MotorInputs & LoggableInputs> extends IO<I> {
 	String getName();
 
 	void readInputs(I inputs);

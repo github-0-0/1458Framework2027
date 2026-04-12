@@ -8,18 +8,16 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import org.littletonrobotics.junction.Logger;
+import org.redtierobotics.lib.sim.servo.ServoSim;
+import org.redtierobotics.lib.sim.servo.ServoSimState;
 import org.redtierobotics.lib.util.CanDevice;
 
-public class SimTalonFXMotorIO extends TalonFXMotorIO {
-	protected DCMotorSim sim;
+public class SimTalonFXMotorIO<S extends ServoSim<?>> extends TalonFXMotorIO {
+	protected S sim;
 	private Notifier simNotifier = null;
 	private double lastUpdateTimestamp = 0.0;
-	private Optional<Double> overrideRPS = Optional.empty();
-	private Optional<Double> overridePos = Optional.empty();
 
 	// Used to handle mechanisms that wrap.
 	private boolean invertVoltage = false;
@@ -29,10 +27,13 @@ public class SimTalonFXMotorIO extends TalonFXMotorIO {
 
 	protected double ratio = 0.0;
 
-	public SimTalonFXMotorIO(
-			CanDevice device, TalonFXConfiguration config, DCMotorSim sim, double ratio) {
+	protected AtomicReference<ServoSimState> cache;
+
+	public SimTalonFXMotorIO(CanDevice device, TalonFXConfiguration config, S sim, double ratio) {
 		super(device, config);
 		this.ratio = ratio;
+		this.sim = sim;
+		cache = new AtomicReference<>(sim.getState().clone());
 		simNotifier =
 				new Notifier(
 						() -> {
@@ -41,10 +42,24 @@ public class SimTalonFXMotorIO extends TalonFXMotorIO {
 		simNotifier.startPeriodic(0.005);
 	}
 
+	public SimTalonFXMotorIO(CanDevice device, TalonFXConfiguration config, S sim) {
+		this(
+				device,
+				config,
+				sim,
+				config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
+	}
+
 	// Need to use rad of the mechanism itself.
 	public void setPositionRad(double rad) {
-		sim.setAngle(
-				(config.MotorOutput.Inverted == InvertedValue.Clockwise_Positive ? -1.0 : 1.0) * rad);
+		cache.getAndUpdate(
+				state -> {
+					state.position.mut_setMagnitude(
+							(config.MotorOutput.Inverted == InvertedValue.Clockwise_Positive ? -1.0 : 1.0) * rad);
+					state.speed.mut_setMagnitude(sim.getState().speed.magnitude());
+					return state;
+				});
+		sim.setState(cache.get());
 		Logger.recordOutput(name + "/Sim/setPositionRad", rad);
 	}
 
@@ -52,30 +67,28 @@ public class SimTalonFXMotorIO extends TalonFXMotorIO {
 		var simState = motor.getSimState();
 		double simVoltage = addFriction(simState.getMotorVoltage(), 0.25);
 		simVoltage = (invertVoltage) ? -simVoltage : simVoltage;
-		sim.setInput(simVoltage);
+		sim.applyInput(simVoltage);
 		Logger.recordOutput(name + "/Sim/SimulatorVoltage", simVoltage);
 
 		double timestamp = Timer.getFPGATimestamp();
-		sim.update(timestamp - lastUpdateTimestamp);
+		sim.periodic(timestamp - lastUpdateTimestamp);
 		lastUpdateTimestamp = timestamp;
 
-		overridePos.ifPresent(aDouble -> sim.setAngle(aDouble));
-
 		// Find current state of sim in radians from 0 point
-		double simPositionRads = sim.getAngularPositionRad();
+		double simPositionRads = sim.getState().position.magnitude();
 		Logger.recordOutput(name + "/Sim/SimulatorPosition", simPositionRads);
 
 		// Mutate rotor position
-		double rotorPosition = Units.radiansToRotations(simPositionRads) / ratio;
+		double rotorPosition = Units.radiansToRotations(simPositionRads) * ratio;
 		lastRotations.set(rotorPosition);
 		simState.setRawRotorPosition(rotorPosition);
 		Logger.recordOutput(name + "/Sim/setRawRotorPosition", rotorPosition);
 
 		// Mutate rotor vel
-		double rotorVel = Units.radiansToRotations(sim.getAngularVelocityRadPerSec()) / ratio;
+		double rotorVel = Units.radiansToRotations(sim.getState().speed.magnitude()) * ratio;
 		lastRPS.set(rotorVel);
-		simState.setRotorVelocity(overrideRPS.isEmpty() ? rotorVel : overrideRPS.get());
-		Logger.recordOutput(name + "/Sim/SimulatorVelocity", sim.getAngularVelocity());
+		simState.setRotorVelocity(rotorVel);
+		Logger.recordOutput(name + "/Sim/SimulatorVelocity", sim.getState().speed.magnitude());
 	}
 
 	protected double addFriction(double motorVoltage, double frictionVoltage) {

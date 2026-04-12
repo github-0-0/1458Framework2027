@@ -3,15 +3,16 @@ package org.redtierobotics.robot2027;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.redtierobotics.robot2027.auto.AutoSelector;
+import org.redtierobotics.robot2027.subsystems.Subsystems;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -23,7 +24,7 @@ public class Robot extends LoggedRobot {
 	private static final CommandScheduler commandScheduler = CommandScheduler.getInstance();
 	private AutoSelector autoChooser;
 	private Command autoCommand;
-	private final SendableChooser<String> mapChooser = new SendableChooser<>();
+	public static final Subsystems subsystems = new Subsystems();
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -62,6 +63,7 @@ public class Robot extends LoggedRobot {
 		} else if (replay) {
 			setUseTiming(false);
 			String logPath = LogFileUtil.findReplayLog();
+			Logger.setReplaySource(new WPILOGReader(logPath));
 			Logger.addDataReceiver(new WPILOGWriter());
 		} else if (RobotBase.isSimulation()) {
 			Logger.addDataReceiver(new NT4Publisher());
@@ -72,6 +74,8 @@ public class Robot extends LoggedRobot {
 		if (!Logger.hasReplaySource()) {
 			RobotController.setTimeSource(RobotController::getFPGATime);
 		}
+
+		autoChooser = new AutoSelector();
 	}
 
 	/**

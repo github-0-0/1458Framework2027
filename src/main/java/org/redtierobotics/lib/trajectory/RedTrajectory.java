@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.redtierobotics.lib.field.FieldUtil;
+import org.redtierobotics.lib.util.ChassisAccels;
 
 public class RedTrajectory {
 	public TrajectoryType type;
@@ -95,47 +96,6 @@ public class RedTrajectory {
 			ChassisAccels flippedAccels = FieldUtil.flipAccels(accels);
 			return new State(timestamp, flippedPose, flippedSpeeds, flippedAccels);
 		}
-
-		/** A class that represents the chassis acceleration. */
-		public static class ChassisAccels {
-			public final double ax, ay, alpha;
-
-			/** Creates a {@code ChassisAccels} with 0 acceleration. */
-			public ChassisAccels() {
-				ax = 0.0;
-				ay = 0.0;
-				alpha = 0.0;
-			}
-
-			/**
-			 * Creates a {@code ChassisAccels}.
-			 *
-			 * @param ax The horizontal acceleration.
-			 * @param ay The vertical acceleration.
-			 * @param alpha The rotational acceleration.
-			 */
-			public ChassisAccels(double ax, double ay, double alpha) {
-				this.ax = ax;
-				this.ay = ay;
-				this.alpha = alpha;
-			}
-
-			/**
-			 * Estimates chassis acceleration from 2 {@code ChassisSpeeds}. This usually works better when
-			 * {@code dt} is lower.
-			 *
-			 * @param first The initial speeds.
-			 * @param second The final speeds.
-			 * @param dt The time difference.
-			 * @return The acceleration.
-			 */
-			public static ChassisAccels estimate(ChassisSpeeds first, ChassisSpeeds second, double dt) {
-				return new ChassisAccels(
-						(second.vxMetersPerSecond - first.vxMetersPerSecond) / dt,
-						(second.vyMetersPerSecond - first.vyMetersPerSecond) / dt,
-						(second.omegaRadiansPerSecond - first.omegaRadiansPerSecond) / dt);
-			}
-		}
 	}
 
 	public Trajectory<SwerveSample> choreoTrajectory;
@@ -155,9 +115,7 @@ public class RedTrajectory {
 		choreoTrajectory = traj;
 		this.type = TrajectoryType.CHOREO;
 		this.flipped =
-				flipForAlliance
-						&& DriverStation.getAlliance().orElse(Alliance.Blue)
-								== Alliance.Red; // RobotState.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+				flipForAlliance && DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
 		this.name = "ChoreoTrajectory#" + traj.name();
 	}
 
@@ -171,9 +129,7 @@ public class RedTrajectory {
 		pathplannerTrajectory = traj;
 		this.type = TrajectoryType.PATHPLANNER;
 		this.flipped =
-				flipForAlliance
-						&& DriverStation.getAlliance().orElse(Alliance.Blue)
-								== Alliance.Red; // RobotState.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+				flipForAlliance && DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
 		this.name = "PathPlannerTrajectory#" + traj.hashCode();
 	}
 
@@ -187,9 +143,7 @@ public class RedTrajectory {
 		pathplannerTrajectory = traj;
 		this.type = TrajectoryType.PATHPLANNER;
 		this.flipped =
-				flipForAlliance
-						&& DriverStation.getAlliance().orElse(Alliance.Blue)
-								== Alliance.Red; // RobotState.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
+				flipForAlliance && DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
 		this.name = "PathPlannerTrajectory#" + name;
 	}
 
@@ -202,7 +156,7 @@ public class RedTrajectory {
 		return switch (type) {
 			case CHOREO -> new State(choreoTrajectory.getInitialSample(false).get());
 			case PATHPLANNER -> new State(pathplannerTrajectory.getInitialState());
-			default -> new State();
+			default -> throw new IllegalArgumentException("Illegal TrajectoryType");
 		};
 	}
 
@@ -215,7 +169,7 @@ public class RedTrajectory {
 		return switch (type) {
 			case CHOREO -> new State(choreoTrajectory.getFinalSample(false).get());
 			case PATHPLANNER -> new State(pathplannerTrajectory.getEndState());
-			default -> new State();
+			default -> throw new IllegalArgumentException("Illegal TrajectoryType");
 		};
 	}
 
@@ -269,7 +223,7 @@ public class RedTrajectory {
 		return switch (type) {
 			case PATHPLANNER -> pathplannerTrajectory.getTotalTimeSeconds() <= progress;
 			case CHOREO -> choreoTrajectory.getTotalTime() <= progress;
-			default -> true;
+			default -> throw new IllegalArgumentException("Illegal TrajectoryType");
 		};
 	}
 
@@ -282,7 +236,7 @@ public class RedTrajectory {
 		return switch (type) {
 			case PATHPLANNER -> pathplannerTrajectory.getTotalTimeSeconds();
 			case CHOREO -> choreoTrajectory.getTotalTime();
-			default -> 0.0;
+			default -> throw new IllegalArgumentException("Illegal TrajectoryType");
 		};
 	}
 
@@ -306,7 +260,7 @@ public class RedTrajectory {
 				State state2 = new State(choreoTrajectory.sampleAt(timestamp, false).get());
 				return flipped ? state2.flip() : state2;
 			default:
-				return new State();
+				throw new IllegalArgumentException("Illegal TrajectoryType");
 		}
 	}
 }

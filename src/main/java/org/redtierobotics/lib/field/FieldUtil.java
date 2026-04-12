@@ -7,7 +7,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import org.redtierobotics.lib.trajectory.RedTrajectory.State.ChassisAccels;
+import org.redtierobotics.lib.util.ChassisAccels;
 
 public class FieldUtil {
 	public enum FieldSymmetry {
