@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import org.redtierobotics.lib.control.ControlConstants.PIDVConstants;
 import org.redtierobotics.lib.control.ControlConstants.ProfiledPIDVConstants;
-import org.redtierobotics.lib.subsystembases.SubsystemConstants;
+import org.redtierobotics.lib.subsystembases.simple.SubsystemConstants;
 import org.redtierobotics.robot2027.subsystems.drive.ctre.TestCtreDriveConstants;
 
 public final class DriveConstants extends SubsystemConstants {

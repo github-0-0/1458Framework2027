@@ -1,13 +1,13 @@
-package org.redtierobotics.lib.subsystembases.complex.statemachine;
+package org.redtierobotics.lib.subsystembases.complex.unweightedstatemachine;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import org.redtierobotics.lib.graph.unweighted.UnweightedEdge;
 import org.redtierobotics.lib.graph.unweighted.UnweightedGraph;
 import org.redtierobotics.lib.graph.unweighted.UnweightedNode;
-import org.redtierobotics.lib.subsystembases.complex.statemachine.StateMachine.StateEdge;
-import org.redtierobotics.lib.subsystembases.complex.statemachine.StateMachine.StateNode;
+import org.redtierobotics.lib.subsystembases.complex.unweightedstatemachine.UnweightedStateMachine.StateEdge;
+import org.redtierobotics.lib.subsystembases.complex.unweightedstatemachine.UnweightedStateMachine.StateNode;
 
-public class StateMachine extends UnweightedGraph<StateNode, StateEdge> {
+public class UnweightedStateMachine extends UnweightedGraph<StateNode, StateEdge> {
 	public static interface State {
 		public StateNode node();
 	}
@@ -29,7 +29,18 @@ public class StateMachine extends UnweightedGraph<StateNode, StateEdge> {
 		}
 	}
 
-	public StateMachine(StateNode start) {
+	protected State current;
+
+	public UnweightedStateMachine(StateNode start) {
 		super(start);
+		current = start.get();
+	}
+
+	public State getState() {
+		return current;
+	}
+
+	public void setState(State state) {
+		current = state;
 	}
 }

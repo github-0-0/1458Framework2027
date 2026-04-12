@@ -1,7 +1,7 @@
 package org.redtierobotics.lib.graph;
 
 public abstract class Node<T> {
-	private T value;
+	private final T value;
 
 	public <U> Node(T object) {
 		this.value = object;

@@ -3,13 +3,13 @@ package org.redtierobotics.lib.graph.weighted;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 import org.redtierobotics.lib.graph.Graph;
+
+import edu.wpi.first.math.Pair;
 
 public class WeightedGraph<NodeType extends WeightedNode<?>, EdgeType extends WeightedEdge<?>>
 		extends Graph<NodeType, EdgeType> {
@@ -21,7 +21,7 @@ public class WeightedGraph<NodeType extends WeightedNode<?>, EdgeType extends We
 	 * @see org.redtierobotics.lib.graph.weighted.WeightedGraph#ucs(NodeType, NodeType)
 	 */
 	@Override
-	public Queue<EdgeType> findPath(NodeType start, NodeType target) {
+	public Queue<Pair<NodeType, EdgeType>> findPath(NodeType start, NodeType target) {
 		if (!containsNode(start) || !containsNode(target)) {
 			return null;
 		}
@@ -37,50 +37,45 @@ public class WeightedGraph<NodeType extends WeightedNode<?>, EdgeType extends We
 	 * @return A {@code Queue} containing the walk to the target in order, including target but not
 	 *     including start.
 	 */
-	protected Queue<EdgeType> ucs(NodeType start, NodeType target) {
-		PriorityQueue<NodeType> current =
-				new PriorityQueue<>((a, b) -> Double.compare(a.getCost(), b.getCost()));
-
+	protected Queue<Pair<NodeType, EdgeType>> ucs(NodeType start, NodeType target) {
 		Map<NodeType, Double> costSoFar = new HashMap<>();
-		Map<NodeType, NodeType> parent = new HashMap<>();
-		Set<NodeType> visited = new HashSet<>();
+		PriorityQueue<NodeType> current =
+   			 new PriorityQueue<>((a, b) -> Double.compare(costSoFar.get(a), costSoFar.get(b)));
 
-		start.setCost(0);
+		Map<NodeType, NodeType> parent = new HashMap<>();
+
 		current.add(start);
 		costSoFar.put(start, 0.0);
 		parent.put(start, null);
 
 		while (!current.isEmpty()) {
 			NodeType node = current.poll();
+			if (node.equals(target)) {
+				Deque<Pair<NodeType, EdgeType>> path = new ArrayDeque<>();
+				NodeType now = target;
 
-			if (!visited.contains(node)) {
-				visited.add(node);
-
-				if (node.equals(target)) {
-					Deque<EdgeType> path = new ArrayDeque<>();
-					NodeType now = target;
-
-					while (parent.get(now) != null) {
-						NodeType prev = parent.get(now);
-						path.addFirst(succession.get(prev).get(now));
-						now = prev;
-					}
-
-					return path;
+				while (parent.get(now) != null) {
+					NodeType prev = parent.get(now);
+					path.addFirst(new Pair<NodeType, EdgeType>(now, succession.get(prev).get(now)));
+					now = prev;
 				}
 
-				Map<NodeType, EdgeType> successors = succession.get(node);
+				return path;
+			}
 
-				for (Entry<NodeType, EdgeType> entry : successors.entrySet()) {
-					NodeType next = entry.getKey();
-					double newCost = costSoFar.get(node) + entry.getValue().weight;
+			Map<NodeType, EdgeType> successors = succession.get(node);
+			if (successors == null) {
+				continue;
+			}
+			
+			for (Entry<NodeType, EdgeType> entry : successors.entrySet()) {
+				NodeType next = entry.getKey();
+				double newCost = costSoFar.get(node) + entry.getValue().weight;
 
-					if (!costSoFar.containsKey(next) || newCost < costSoFar.get(next)) {
-						costSoFar.put(next, newCost);
-						next.setCost(newCost);
-						parent.put(next, node);
-						current.add(next);
-					}
+				if (!costSoFar.containsKey(next) || newCost < costSoFar.get(next)) {
+					costSoFar.put(next, newCost);
+					parent.put(next, node);
+					current.add(next);
 				}
 			}
 		}
