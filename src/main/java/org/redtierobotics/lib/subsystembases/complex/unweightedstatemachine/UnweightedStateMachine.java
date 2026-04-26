@@ -10,6 +10,7 @@ import org.redtierobotics.lib.subsystembases.complex.unweightedstatemachine.Unwe
 public class UnweightedStateMachine extends UnweightedGraph<StateNode, StateEdge> {
 	public static interface State {
 		public StateNode node();
+		public String toString();
 	}
 
 	public static class StateNode extends UnweightedNode<State> {

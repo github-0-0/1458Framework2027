@@ -13,8 +13,6 @@ import org.redtierobotics.lib.io.IO;
 import org.redtierobotics.lib.io.Inputs;
 
 public abstract class LoggedSubsystemBase extends SubsystemBase {
-	public record IOEntry<I extends Inputs & LoggableInputs>(IO<I> io, I inputs) {}
-
 	protected String name;
 	protected Set<Runnable> ioRegistry;
 

@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -25,6 +27,7 @@ public class Robot extends LoggedRobot {
 	private AutoSelector autoChooser;
 	private Command autoCommand;
 	public static final Subsystems subsystems = new Subsystems();
+	public static final Operator operator = new Operator(new CommandXboxController(0));
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -130,6 +133,9 @@ public class Robot extends LoggedRobot {
 		if (autoCommand != null) {
 			autoCommand.cancel();
 		}
+
+		operator.bindTeleop();
+		operator.setDefaults();
 	}
 
 	/** This function is called periodically during operator control. */

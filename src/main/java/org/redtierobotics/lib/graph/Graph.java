@@ -1,13 +1,12 @@
 package org.redtierobotics.lib.graph;
 
+import edu.wpi.first.math.Pair;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
-
-import edu.wpi.first.math.Pair;
 
 public abstract class Graph<NodeType extends Node<?>, EdgeType extends Edge<?>> {
 	protected Map<NodeType, Map<NodeType, EdgeType>> succession = new HashMap<>();
@@ -28,7 +27,7 @@ public abstract class Graph<NodeType extends Node<?>, EdgeType extends Edge<?>> 
 		addNode(second);
 
 		succession.get(first).put(second, edge);
-		
+
 		return this;
 	}
 
@@ -62,7 +61,7 @@ public abstract class Graph<NodeType extends Node<?>, EdgeType extends Edge<?>> 
 	public boolean containsNode(NodeType node) {
 		return nodes.contains(node);
 	}
-	
+
 	protected Map<NodeType, EdgeType> getSuccessors(NodeType node) {
 		return succession.get(node);
 	}

@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import org.redtierobotics.lib.graph.weighted.WeightedEdge;
 import org.redtierobotics.lib.graph.weighted.WeightedGraph;
 import org.redtierobotics.lib.graph.weighted.WeightedNode;
-import org.redtierobotics.lib.subsystembases.complex.weightedstatemachine.WeightedStateMachine.StateNode;
 import org.redtierobotics.lib.subsystembases.complex.weightedstatemachine.WeightedStateMachine.StateEdge;
+import org.redtierobotics.lib.subsystembases.complex.weightedstatemachine.WeightedStateMachine.StateNode;
 
 public class WeightedStateMachine extends WeightedGraph<StateNode, StateEdge> {
 	public static interface State {

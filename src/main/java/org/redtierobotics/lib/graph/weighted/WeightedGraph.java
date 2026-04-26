@@ -1,5 +1,6 @@
 package org.redtierobotics.lib.graph.weighted;
 
+import edu.wpi.first.math.Pair;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -8,8 +9,6 @@ import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import org.redtierobotics.lib.graph.Graph;
-
-import edu.wpi.first.math.Pair;
 
 public class WeightedGraph<NodeType extends WeightedNode<?>, EdgeType extends WeightedEdge<?>>
 		extends Graph<NodeType, EdgeType> {
@@ -40,7 +39,7 @@ public class WeightedGraph<NodeType extends WeightedNode<?>, EdgeType extends We
 	protected Queue<Pair<NodeType, EdgeType>> ucs(NodeType start, NodeType target) {
 		Map<NodeType, Double> costSoFar = new HashMap<>();
 		PriorityQueue<NodeType> current =
-   			 new PriorityQueue<>((a, b) -> Double.compare(costSoFar.get(a), costSoFar.get(b)));
+				new PriorityQueue<>((a, b) -> Double.compare(costSoFar.get(a), costSoFar.get(b)));
 
 		Map<NodeType, NodeType> parent = new HashMap<>();
 
@@ -67,7 +66,7 @@ public class WeightedGraph<NodeType extends WeightedNode<?>, EdgeType extends We
 			if (successors == null) {
 				continue;
 			}
-			
+
 			for (Entry<NodeType, EdgeType> entry : successors.entrySet()) {
 				NodeType next = entry.getKey();
 				double newCost = costSoFar.get(node) + entry.getValue().weight;

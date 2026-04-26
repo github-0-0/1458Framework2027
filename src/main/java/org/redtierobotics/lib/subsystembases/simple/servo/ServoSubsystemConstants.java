@@ -3,7 +3,6 @@ package org.redtierobotics.lib.subsystembases.simple.servo;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Time;
-
 import org.redtierobotics.lib.subsystembases.simple.SubsystemConstants;
 import org.redtierobotics.lib.util.CanDevice;
 

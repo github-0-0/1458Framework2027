@@ -1,5 +1,6 @@
 package org.redtierobotics.lib.graph.unweighted;
 
+import edu.wpi.first.math.Pair;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -9,8 +10,6 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 import org.redtierobotics.lib.graph.Graph;
-
-import edu.wpi.first.math.Pair;
 
 public class UnweightedGraph<NodeType extends UnweightedNode<?>, EdgeType extends UnweightedEdge<?>>
 		extends Graph<NodeType, EdgeType> {
@@ -58,7 +57,7 @@ public class UnweightedGraph<NodeType extends UnweightedNode<?>, EdgeType extend
 			if (successors == null) {
 				continue;
 			}
-			
+
 			for (Entry<NodeType, EdgeType> successor : successors.entrySet()) {
 				NodeType successorNode = successor.getKey();
 				if (!visited.contains(successorNode)) {
@@ -70,7 +69,7 @@ public class UnweightedGraph<NodeType extends UnweightedNode<?>, EdgeType extend
 
 						while (parent.get(now) != null) {
 							NodeType prev = parent.get(now);
-							path.addFirst(new Pair<NodeType, EdgeType>(now, getSuccessors(node).get(now)));
+							path.addFirst(new Pair<NodeType, EdgeType>(now, getSuccessors(prev).get(now)));
 							now = prev;
 						}
 

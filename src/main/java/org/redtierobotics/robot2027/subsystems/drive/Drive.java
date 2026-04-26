@@ -139,14 +139,14 @@ public class Drive extends LoggedSubsystemBase {
 
 	/** Open loop during teleop */
 	public Command openLoopControl(
-			DoubleSupplier xAxis, DoubleSupplier yAxis, DoubleSupplier rotationAxis) {
+			DoubleSupplier xSpeed, DoubleSupplier ySpeed, DoubleSupplier rotationSpeed) {
 		JoystickVector stick = new JoystickVector();
 		return drive(
 						() -> new FieldCentric(),
 						(request) -> {
-							double rawX = -yAxis.getAsDouble();
-							double rawY = -xAxis.getAsDouble();
-							double rawOmega = -rotationAxis.getAsDouble();
+							double rawX = xSpeed.getAsDouble();
+							double rawY = ySpeed.getAsDouble();
+							double rawOmega = rotationSpeed.getAsDouble();
 
 							stick.x = rawX;
 							stick.y = rawY;
@@ -318,7 +318,7 @@ public class Drive extends LoggedSubsystemBase {
 	}
 
 	/** Locks the robot onto a pose. Utilizes feedforwards derived from the current chassis speeds */
-	public Command headingLock(DoubleSupplier xAxis, DoubleSupplier yAxis, Translation2d pose) {
+	public Command headingLock(DoubleSupplier xSpeed, DoubleSupplier ySpeed, Translation2d pose) {
 		JoystickVector stick = new JoystickVector();
 
 		ProfiledPIDVController thetaController =
@@ -331,8 +331,8 @@ public class Drive extends LoggedSubsystemBase {
 		return drive(
 						() -> new FieldCentric(),
 						(request) -> {
-							double rawX = -yAxis.getAsDouble();
-							double rawY = -xAxis.getAsDouble();
+							double rawX = xSpeed.getAsDouble();
+							double rawY = ySpeed.getAsDouble();
 
 							stick.x = rawX;
 							stick.y = rawY;
@@ -427,47 +427,4 @@ public class Drive extends LoggedSubsystemBase {
 						.lte(MAX_SPEED_SCORING_TRANSLATION)
 				&& Units.RadiansPerSecond.of(speeds.omegaRadiansPerSecond).lte(MAX_ROTATION_SPEED_SCORING);
 	}
-
-	// @Override
-	// public void initSendable(SendableBuilder builder) {
-	// 	super.initSendable(builder);
-	// 	builder.addDoubleProperty(
-	// 		"Pitch Velocity Degrees Per Second",
-	// 		() -> drivetrain
-	// 			.getPigeon2()
-	// 			.getAngularVelocityYDevice()
-	// 			.getValue()
-	// 			.in(Units.DegreesPerSecond),
-	// 		null);
-	// 	builder.addDoubleProperty(
-	// 		"Pitch Degrees",
-	// 		() -> drivetrain.getPigeon2().getPitch().getValue().in(Units.Degrees),
-	// 		null);
-
-	// 	builder.addDoubleProperty(
-	// 		"Roll Velocity Degrees Per Second",
-	// 		() -> drivetrain
-	// 			.getPigeon2()
-	// 			.getAngularVelocityXDevice()
-	// 			.getValue()
-	// 			.in(Units.DegreesPerSecond),
-	// 		null);
-	// 	builder.addDoubleProperty(
-	// 		"Roll Degrees",
-	// 		() -> drivetrain.getPigeon2().getRoll().getValue().in(Units.Degrees),
-	// 		null);
-
-	// 	addModuleToBuilder(builder, 0);
-	// 	addModuleToBuilder(builder, 1);
-	// 	addModuleToBuilder(builder, 2);
-	// 	addModuleToBuilder(builder, 3);
-	// }
-
-	// /** Telemeterizes a module */
-	// private void addModuleToBuilder(SendableBuilder builder, int module) {
-	// 	TelemetryManager.makeSendableTalonFX("Modules/" + module + "/Drive",
-	// 		drivetrain.getModules()[module].getDriveMotor(), builder);
-	// 	TelemetryManager.makeSendableTalonFX("Modules/" + module + "/Angle",
-	// 		drivetrain.getModules()[module].getSteerMotor(), builder);
-	// }
 }

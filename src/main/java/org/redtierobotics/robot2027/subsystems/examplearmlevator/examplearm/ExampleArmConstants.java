@@ -1,4 +1,4 @@
-package org.redtierobotics.robot2027.subsystems.examplearm;
+package org.redtierobotics.robot2027.subsystems.examplearmlevator.examplearm;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -34,13 +34,13 @@ import org.redtierobotics.lib.sim.servo.arm.ArmSim;
 import org.redtierobotics.lib.util.CanDevice;
 
 public class ExampleArmConstants {
-	public static record Setpoint(Angle armAngle) {
-		public static final Setpoint HIGH = new Setpoint(Degrees.of(45));
-		public static final Setpoint MID = new Setpoint(Degrees.of(0));
-		public static final Setpoint LOW = new Setpoint(Degrees.of(-45));
+	public static record ArmSetpoint(Angle armAngle) {
+		public static final ArmSetpoint HIGH = new ArmSetpoint(Degrees.of(45));
+		public static final ArmSetpoint MID = new ArmSetpoint(Degrees.of(0));
+		public static final ArmSetpoint LOW = new ArmSetpoint(Degrees.of(-45));
 	}
 
-	public static final CanDevice DEVICE = CanDevice.fromId(0);
+	public static final CanDevice DEVICE = CanDevice.fromId(20);
 	public static final Angle POSITION_EPSILON = Degrees.of(3);
 	public static final AngularVelocity VELOCITY_EPSILON = DegreesPerSecond.of(10);
 	public static final Time DEBOUNCE = Milliseconds.of(40);
@@ -66,7 +66,7 @@ public class ExampleArmConstants {
 							new Slot0Configs()
 									.withKS(0.125)
 									.withKV(0.0)
-									.withKP(60.0)
+									.withKP(100.0)
 									.withKI(0.0)
 									.withKD(0.05)
 									.withKG(0.375)

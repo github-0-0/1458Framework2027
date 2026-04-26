@@ -4,9 +4,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.function.BiFunction;
-
 import org.redtierobotics.lib.subsystembases.complex.CompositeSubsystemBase;
 import org.redtierobotics.lib.subsystembases.complex.weightedstatemachine.WeightedStateMachine.State;
 import org.redtierobotics.lib.subsystembases.complex.weightedstatemachine.WeightedStateMachine.StateEdge;
@@ -15,9 +13,9 @@ import org.redtierobotics.lib.subsystembases.complex.weightedstatemachine.Weight
 public abstract class WeightedStateMachineSubsystemBase extends CompositeSubsystemBase {
 	protected WeightedStateMachine stateMachine;
 
-	public WeightedStateMachineSubsystemBase(SubsystemBase... subsystems) {
+	public WeightedStateMachineSubsystemBase(StateNode start, SubsystemBase... subsystems) {
 		super(subsystems);
-		setUpStateMachine();
+		stateMachine = new WeightedStateMachine(start);
 	}
 
 	protected abstract void setUpStateMachine();
@@ -26,37 +24,50 @@ public abstract class WeightedStateMachineSubsystemBase extends CompositeSubsyst
 		stateMachine.connectSingleSided(first.node(), second.node(), new StateEdge(edge, timeEst));
 	}
 
-	public void addStateTransitionDoubleSided(State first, State second, Command toSecond, Command toFirst, double timeToSecond, double timeToFirst) {
-		stateMachine.connectDoubleSided(first.node(), second.node(), new StateEdge(toSecond, timeToSecond), new StateEdge(toFirst, timeToFirst));
+	public void addStateTransitionDoubleSided(
+			State first,
+			State second,
+			Command toSecond,
+			Command toFirst,
+			double timeToSecond,
+			double timeToFirst) {
+		stateMachine.connectDoubleSided(
+				first.node(),
+				second.node(),
+				new StateEdge(toSecond, timeToSecond),
+				new StateEdge(toFirst, timeToFirst));
 	}
 
-	public void interconnect(BiFunction<State, State, Pair<Command, Double>> interconnector, State... states) {
+	public void interconnect(
+			BiFunction<State, State, Pair<Command, Double>> interconnector, State... states) {
 		for (int i = 0; i < states.length; i++) {
 			for (int j = 0; j < states.length; j++) {
 				if (i != j) {
 					addStateTransitionDoubleSided(
-						states[i],
-						states[j], 
-						interconnector.apply(states[i], states[j]).getFirst(), 
-						interconnector.apply(states[j], states[i]).getFirst(),
-						interconnector.apply(states[i], states[j]).getSecond(), 
-						interconnector.apply(states[j], states[i]).getSecond());
+							states[i],
+							states[j],
+							interconnector.apply(states[i], states[j]).getFirst(),
+							interconnector.apply(states[j], states[i]).getFirst(),
+							interconnector.apply(states[i], states[j]).getSecond(),
+							interconnector.apply(states[j], states[i]).getSecond());
 				}
 			}
 		}
 	}
 
 	public Command state(State state) {
-		return defer(() -> {
-			var path = stateMachine.findPath(stateMachine.getState().node(), state.node());
-			Command[] commands = new Command[path.size()];
-			int i = 0;
-			for (Pair<StateNode, StateEdge> step : path) {
-				var cmd = step.getSecond().get();
-				commands[i++] = cmd.andThen(runOnce(() -> stateMachine.setState(step.getFirst().get())));
-			}
+		return defer(
+				() -> {
+					var path = stateMachine.findPath(stateMachine.getState().node(), state.node());
+					Command[] commands = new Command[path.size()];
+					int i = 0;
+					for (Pair<StateNode, StateEdge> step : path) {
+						var cmd = step.getSecond().get();
+						commands[i++] =
+								cmd.andThen(runOnce(() -> stateMachine.setState(step.getFirst().get())));
+					}
 
-			return Commands.sequence(commands);
-		});
+					return Commands.sequence(commands);
+				});
 	}
 }

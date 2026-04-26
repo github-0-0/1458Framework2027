@@ -1,14 +1,15 @@
-package org.redtierobotics.robot2027.subsystems.examplearm;
-
-import static org.redtierobotics.robot2027.subsystems.examplearm.ExampleArmConstants.*;
+package org.redtierobotics.robot2027.subsystems.examplearmlevator.examplearm;
 
 import edu.wpi.first.wpilibj2.command.Command;
+
+import static org.redtierobotics.robot2027.subsystems.examplearmlevator.examplearm.ExampleArmConstants.*;
+
 import org.redtierobotics.lib.io.motor.talonfx.SimTalonFXMotorIO;
 import org.redtierobotics.lib.io.motor.talonfx.TalonFXMotorIO;
 import org.redtierobotics.lib.subsystembases.simple.servo.talonfx.TalonFXServoSubsystemBase;
 import org.redtierobotics.lib.subsystembases.simple.servo.talonfx.TalonFXServoSubsystemConstants;
 import org.redtierobotics.robot2027.Robot;
-import org.redtierobotics.robot2027.subsystems.examplearm.ExampleArmConstants.Setpoint;
+import org.redtierobotics.robot2027.subsystems.examplearmlevator.examplearm.ExampleArmConstants.ArmSetpoint;
 
 public class ExampleArm extends TalonFXServoSubsystemBase {
 	public ExampleArm() {
@@ -21,7 +22,7 @@ public class ExampleArm extends TalonFXServoSubsystemBase {
 		io.resetPosition(STARTING_ANGLE);
 	}
 
-	public Command setpoint(Setpoint setpoint) {
+	public Command setpoint(ArmSetpoint setpoint) {
 		return profiledMoveToPositionBlocking(setpoint.armAngle());
 	}
 }

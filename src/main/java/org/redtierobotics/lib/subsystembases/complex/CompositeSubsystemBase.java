@@ -4,20 +4,27 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.MutTime;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.HashSet;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
 
 public abstract class CompositeSubsystemBase extends SubsystemBase {
-	protected Set<SubsystemBase> subsystems;
+	protected Set<Subsystem> subsystems;
 
 	protected String name;
 
 	private MutTime latency = Seconds.mutable(0.0);
 
-	public CompositeSubsystemBase(SubsystemBase... subsystems) {
+	public CompositeSubsystemBase(Subsystem... subsystems) {
 		name = getName();
-		this.subsystems = Set.of(subsystems);
+		this.subsystems = new HashSet<>();
+		for (Subsystem subsystem : subsystems) {
+			this.subsystems.add(subsystem);
+		}
+		this.subsystems.add(this);
 	}
 
 	@Override
