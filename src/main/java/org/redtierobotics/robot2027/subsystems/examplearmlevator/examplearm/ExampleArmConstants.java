@@ -46,7 +46,7 @@ public class ExampleArmConstants {
 	public static final Time DEBOUNCE = Milliseconds.of(40);
 
 	public static final AngularVelocity MAX_SPEED = DegreesPerSecond.of(300);
-	public static final AngularAcceleration MAX_ACCEL = DegreesPerSecondPerSecond.of(300);
+	public static final AngularAcceleration MAX_ACCEL = DegreesPerSecondPerSecond.of(800);
 
 	public static final Angle MAX_ANGLE = Degrees.of(50);
 	public static final Angle MIN_ANGLE = Degrees.of(-90);

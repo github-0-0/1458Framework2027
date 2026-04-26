@@ -7,10 +7,12 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.redtierobotics.lib.sim.servo.ServoSim;
 import org.redtierobotics.lib.sim.servo.ServoSimState;
 
+/** Simulates an arm, or any similar angular subsystem with gravity */
 public class ArmSim implements ServoSim<ArmSimState> {
 	private SingleJointedArmSim sim;
 	private ArmSimState state;
 
+	/** Constructs an ArmSim from the wpilib equivalent */
 	public ArmSim(SingleJointedArmSim sim) {
 		this.sim = sim;
 		state = new ArmSimState();

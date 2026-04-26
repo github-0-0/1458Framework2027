@@ -24,6 +24,14 @@ public abstract class LoggedSubsystemBase extends SubsystemBase {
 		ioRegistry = new HashSet<>(1);
 	}
 
+	/**
+	 * Registers a logged sub-IO
+	 *
+	 * @param <I> Input type (format __InputsAutoLogged)
+	 * @param name Name of the IO
+	 * @param io the IO object
+	 * @param inputs the Inputs object
+	 */
 	protected <I extends Inputs & LoggableInputs> void registerIO(String name, IO<I> io, I inputs) {
 		String tableName = this.name + "/" + name;
 		io.setLoggingKey(tableName);
@@ -34,6 +42,13 @@ public abstract class LoggedSubsystemBase extends SubsystemBase {
 				});
 	}
 
+	/**
+	 * Registers the main IO
+	 *
+	 * @param <I> Input type (format __InputsAutoLogged)
+	 * @param io the IO object
+	 * @param inputs the Inputs object
+	 */
 	protected <I extends Inputs & LoggableInputs> void registerMainIO(IO<I> io, I inputs) {
 		io.setLoggingKey(name);
 		ioRegistry.add(
@@ -47,13 +62,17 @@ public abstract class LoggedSubsystemBase extends SubsystemBase {
 	public void periodic() {
 		double timestamp = Timer.getFPGATimestamp();
 
+		/** Logs all */
 		for (Runnable ioEntry : ioRegistry) {
 			ioEntry.run();
 		}
 
+		// Log the current command
 		Logger.recordOutput(
 				getName() + "/currentCommand",
-				(getCurrentCommand() == null) ? "Default" : getCurrentCommand().getName());
+				(getCurrentCommand() == null) ? "None" : getCurrentCommand().getName());
+
+		// Log epoch latency
 		latency.mut_setMagnitude(Timer.getFPGATimestamp() - timestamp);
 		Logger.recordOutput(getName() + "/latency", latency);
 	}

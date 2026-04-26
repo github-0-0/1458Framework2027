@@ -13,24 +13,24 @@ public abstract class Node<T> {
 		return value;
 	}
 
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	@Override
-    public boolean equals(Object o) {
-        if (this == o) {
+	public boolean equals(Object o) {
+		if (this == o) {
 			return true;
 		}
-        
-        if (o == null || getClass() != o.getClass()) {
+
+		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-        
-        Node<T> node = (Node<T>) o;
-        
-        return value.equals(node.get());
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
+		Node<T> node = (Node<T>) o;
+
+		return value.equals(node.get());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
+	}
 }

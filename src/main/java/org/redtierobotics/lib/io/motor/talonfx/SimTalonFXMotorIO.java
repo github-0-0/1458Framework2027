@@ -29,6 +29,7 @@ public class SimTalonFXMotorIO<S extends ServoSim<?>> extends TalonFXMotorIO {
 
 	protected AtomicReference<ServoSimState> cache;
 
+	/** Creates a simulated TalonFX IO */
 	public SimTalonFXMotorIO(CanDevice device, TalonFXConfiguration config, S sim, double ratio) {
 		super(device, config);
 		this.ratio = ratio;
@@ -50,7 +51,7 @@ public class SimTalonFXMotorIO<S extends ServoSim<?>> extends TalonFXMotorIO {
 				config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio);
 	}
 
-	// Need to use rad of the mechanism itself.
+	/** Sets the mechanism position, in radians */
 	public void setPositionRad(double rad) {
 		cache.getAndUpdate(
 				state -> {
@@ -63,6 +64,7 @@ public class SimTalonFXMotorIO<S extends ServoSim<?>> extends TalonFXMotorIO {
 		Logger.recordOutput(name + "/Sim/setPositionRad", rad);
 	}
 
+	/** Updates the internal sim state */
 	protected void updateSimState() {
 		var simState = motor.getSimState();
 		double simVoltage = addFriction(simState.getMotorVoltage(), 0.25);
@@ -91,6 +93,7 @@ public class SimTalonFXMotorIO<S extends ServoSim<?>> extends TalonFXMotorIO {
 		Logger.recordOutput(name + "/Sim/SimulatorVelocity", sim.getState().speed.magnitude());
 	}
 
+	/** Adds voltage friction (thx cheesy poofs for introducing us to the concept of inefficiency) */
 	protected double addFriction(double motorVoltage, double frictionVoltage) {
 		if (Math.abs(motorVoltage) < frictionVoltage) {
 			motorVoltage = 0.0;
@@ -102,6 +105,7 @@ public class SimTalonFXMotorIO<S extends ServoSim<?>> extends TalonFXMotorIO {
 		return motorVoltage;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void resetPosition(Angle position) {
 		setPositionRad(position.in(Radians));

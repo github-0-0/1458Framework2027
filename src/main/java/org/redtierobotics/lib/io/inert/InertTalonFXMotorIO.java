@@ -48,6 +48,7 @@ public class InertTalonFXMotorIO implements IO<TalonFXInputsAutoLogged> {
 						temperatureSignal);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void readInputs(TalonFXInputsAutoLogged inputs) {
 		BaseStatusSignal.refreshAll(signals);
@@ -61,6 +62,7 @@ public class InertTalonFXMotorIO implements IO<TalonFXInputsAutoLogged> {
 		inputs.temperature.mut_replace(temperatureSignal.getValue());
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setLoggingKey(String name) {
 		this.name = name;

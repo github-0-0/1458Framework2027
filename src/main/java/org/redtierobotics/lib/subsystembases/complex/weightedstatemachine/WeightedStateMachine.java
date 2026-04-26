@@ -1,6 +1,7 @@
 package org.redtierobotics.lib.subsystembases.complex.weightedstatemachine;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.Supplier;
 import org.redtierobotics.lib.graph.weighted.WeightedEdge;
 import org.redtierobotics.lib.graph.weighted.WeightedGraph;
 import org.redtierobotics.lib.graph.weighted.WeightedNode;
@@ -9,7 +10,11 @@ import org.redtierobotics.lib.subsystembases.complex.weightedstatemachine.Weight
 
 public class WeightedStateMachine extends WeightedGraph<StateNode, StateEdge> {
 	public static interface State {
+		/** Creates a StateNode object for this state */
 		public StateNode node();
+
+		/** Name of the state */
+		public String toString();
 	}
 
 	public static class StateNode extends WeightedNode<State> {
@@ -18,13 +23,13 @@ public class WeightedStateMachine extends WeightedGraph<StateNode, StateEdge> {
 		}
 	}
 
-	public static class StateEdge extends WeightedEdge<Command> {
-		public StateEdge(Command state, double timeEstSec) {
+	public static class StateEdge extends WeightedEdge<Supplier<Command>> {
+		public StateEdge(Supplier<Command> state, double timeEstSec) {
 			super(state, timeEstSec);
 		}
 
 		@Override
-		public WeightedEdge<Command> clone() {
+		public WeightedEdge<Supplier<Command>> clone() {
 			return new StateEdge(value, weight);
 		}
 	}

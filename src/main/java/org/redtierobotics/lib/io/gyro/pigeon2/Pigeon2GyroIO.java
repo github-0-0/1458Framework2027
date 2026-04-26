@@ -17,6 +17,7 @@ public class Pigeon2GyroIO implements GyroIO<Pigeon2GyroInputsAutoLogged> {
 
 	private final Pigeon2 pigeon;
 
+	/** Creates a gyro IO for a CTRE Pigeon 2.0 */
 	public Pigeon2GyroIO(Pigeon2 pigeon) {
 		this.pigeon = pigeon;
 		yaw = pigeon.getYaw();
@@ -27,6 +28,7 @@ public class Pigeon2GyroIO implements GyroIO<Pigeon2GyroInputsAutoLogged> {
 		rollVelocity = pigeon.getAngularVelocityXWorld();
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void readInputs(Pigeon2GyroInputsAutoLogged inputs) {
 		inputs.rotation = pigeon.getRotation3d();
@@ -38,6 +40,7 @@ public class Pigeon2GyroIO implements GyroIO<Pigeon2GyroInputsAutoLogged> {
 		inputs.rollVelocity.mut_replace(rollVelocity.getValue());
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setLoggingKey(String name) {
 		this.name = name;

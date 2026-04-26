@@ -6,7 +6,6 @@ import edu.wpi.first.units.measure.MutTime;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.HashSet;
 import java.util.Set;
 import org.littletonrobotics.junction.Logger;
@@ -18,6 +17,7 @@ public abstract class CompositeSubsystemBase extends SubsystemBase {
 
 	private MutTime latency = Seconds.mutable(0.0);
 
+	/** A subsystem involving multiple sub-subsystems */
 	public CompositeSubsystemBase(Subsystem... subsystems) {
 		name = getName();
 		this.subsystems = new HashSet<>();
@@ -31,9 +31,12 @@ public abstract class CompositeSubsystemBase extends SubsystemBase {
 	public void periodic() {
 		double timestamp = Timer.getFPGATimestamp();
 
+		// Record the current command
 		Logger.recordOutput(
 				getName() + "/currentCommand",
-				(getCurrentCommand() == null) ? "Default" : getCurrentCommand().getName());
+				(getCurrentCommand() == null) ? "None" : getCurrentCommand().getName());
+
+		// Record latency
 		latency.mut_setMagnitude(Timer.getFPGATimestamp() - timestamp);
 		Logger.recordOutput(getName() + "/latency", latency);
 	}

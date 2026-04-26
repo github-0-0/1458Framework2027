@@ -101,24 +101,28 @@ public class TalonFXMotorIO implements MotorIO<TalonFXInputsAutoLogged> {
 		inputs.temperature.mut_replace(temperatureSignal.getValue());
 	}
 
+	/** Sets the motor control request */
 	public StatusCode setControl(ControlRequest request) {
 		this.request = request;
 		Logger.recordOutput(name + "/ControlRequest/Type", request.getName());
 		return motor.setControl(request);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setDutyCycle(double dutyCycle) {
 		Logger.recordOutput(name + "/ControlRequest/DutyCycle", dutyCycle);
 		setControl(dutyCycleControl.withOutput(dutyCycle));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setVoltage(Voltage voltage) {
 		Logger.recordOutput(name + "/ControlRequest/Voltage", voltage);
 		setControl(voltageControl.withOutput(voltage));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setProfiledSetpoint(
 			Angle position,
@@ -140,46 +144,54 @@ public class TalonFXMotorIO implements MotorIO<TalonFXInputsAutoLogged> {
 						.withFeedForward(feedforward));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setBrake() {
 		setControl(brakeControl);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setCoast() {
 		setControl(coastControl);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setPosition(Angle position) {
 		Logger.recordOutput(name + "/ControlRequest/Position", position);
 		setControl(positionVoltageControl.withPosition(position));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setProfiledPosition(Angle position) {
 		Logger.recordOutput(name + "/ControlRequest/ProfiledPosition", position);
 		setControl(motionMagicPositionControl.withPosition(position));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setVelocity(AngularVelocity velocity) {
 		Logger.recordOutput(name + "/ControlRequest/Velocity", velocity);
 		setControl(velocityVoltageControl.withVelocity(velocity));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setTorqueCurrent(Current current) {
 		Logger.recordOutput(name + "/ControlRequest/TorqueCurrent", current);
 		setControl(torqueCurrentFOC.withOutput(current));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void resetPosition(Angle position) {
 		CtreUtil.tryUntilOk(() -> motor.setPosition(position), motor.getDeviceID());
 		Logger.recordOutput(name + "/LastResetPosition", position);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setLoggingKey(String name) {
 		this.name = name;
@@ -192,16 +204,19 @@ public class TalonFXMotorIO implements MotorIO<TalonFXInputsAutoLogged> {
 		g = new LoggedNetworkNumber("Tuning/" + name + "/Gains/G", config.Slot0.kG);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public String getName() {
 		return name;
 	}
 
+	/** Sets the gains for the motor, including all PID and feedforward configs */
 	public void setGainsSlot0(double p, double i, double d, double v, double s, double a, double g) {
 		config.Slot0.withKP(p).withKI(i).withKD(d).withKV(v).withKS(s).withKA(a).withKG(g);
 		CtreUtil.applyConfiguration(motor, config);
 	}
 
+	/** Gets values from NT and tunes gains with them */
 	public void tuneGains() {
 		setGainsSlot0(
 				p.getAsDouble(),

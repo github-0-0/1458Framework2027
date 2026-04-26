@@ -16,10 +16,10 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import org.redtierobotics.lib.control.ControlConstants.PIDVConstants;
 import org.redtierobotics.lib.control.ControlConstants.ProfiledPIDVConstants;
-import org.redtierobotics.lib.subsystembases.simple.SubsystemConstants;
+import org.redtierobotics.lib.subsystembases.simple.SubsystemConfig;
 import org.redtierobotics.robot2027.subsystems.drive.ctre.TestCtreDriveConstants;
 
-public final class DriveConstants extends SubsystemConstants {
+public final class DriveConstants extends SubsystemConfig {
 	public static final double EPSILON_TRANSLATION = 0.015; // cm
 	public static final double EPSILON_ROTATION = Units.Degrees.of(1.5).in(Units.Radians);
 

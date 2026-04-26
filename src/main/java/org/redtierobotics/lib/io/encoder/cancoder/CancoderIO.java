@@ -18,6 +18,7 @@ public class CancoderIO implements EncoderIO<CancoderIOInputsAutoLogged> {
 
 	public List<BaseStatusSignal> signals;
 
+	/** Creates a loggable CANCoder IO */
 	public CancoderIO(CANcoder cancoder) {
 		this.cancoder = cancoder;
 		positionSignal = cancoder.getPosition();
@@ -25,6 +26,7 @@ public class CancoderIO implements EncoderIO<CancoderIOInputsAutoLogged> {
 		signals = List.of(positionSignal, velocitySignal);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void readInputs(CancoderIOInputsAutoLogged inputs) {
 		BaseStatusSignal.refreshAll(signals);
@@ -32,15 +34,18 @@ public class CancoderIO implements EncoderIO<CancoderIOInputsAutoLogged> {
 		inputs.velocityRPS.mut_replace(velocitySignal.getValue());
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setLoggingKey(String name) {
 		this.name = name;
 	}
 
+	/** {@inheritDoc} */
 	public void resetPosition(Angle newPosition) {
 		cancoder.setPosition(newPosition);
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void updateFrequency(Frequency frequency) {
 		BaseStatusSignal.setUpdateFrequencyForAll(frequency, signals);

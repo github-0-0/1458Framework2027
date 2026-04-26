@@ -8,17 +8,24 @@ import org.redtierobotics.lib.io.motor.talonfx.TalonFXMotorIO;
 import org.redtierobotics.lib.subsystembases.simple.servo.ServoSubsystemBase;
 
 public class TalonFXServoSubsystemBase extends ServoSubsystemBase {
-	public TalonFXServoSubsystemBase(TalonFXMotorIO io, TalonFXServoSubsystemConstants constants) {
-		super(io, new TalonFXInputsAutoLogged(), constants);
+	/**
+	 * Constructs a subsystem with one TalonFX motor
+	 *
+	 * @param io The TalonFX IO object
+	 * @param config Configs for the TalonFX
+	 */
+	public TalonFXServoSubsystemBase(TalonFXMotorIO io, TalonFXServoSubsystemConfig config) {
+		super(io, new TalonFXInputsAutoLogged(), config);
 	}
 
-	public final Command manualTune = runOnce(() -> ((TalonFXMotorIO) io).tuneGains());
+	protected final Command manualTune = runOnce(() -> ((TalonFXMotorIO) io).tuneGains());
 
+	/** Updates feedback gains based on network values */
 	public Command manualTune() {
 		return manualTune;
 	}
 
-	public final SysIdRoutine sysIdRoutine =
+	protected final SysIdRoutine sysIdRoutine =
 			new SysIdRoutine(
 					new SysIdRoutine.Config(
 							null,
@@ -30,6 +37,13 @@ public class TalonFXServoSubsystemBase extends ServoSubsystemBase {
 							null, // No log consumer, since data is recorded by AdvantageKit
 							this));
 
+	/**
+	 * Runs sysid on the subsystem
+	 *
+	 * @param forward True for forward, false for reverse
+	 * @param dynamic True for dynamic, false for quasistatic
+	 * @return
+	 */
 	public Command sysid(boolean forward, boolean dynamic) {
 		return dynamic
 				? sysIdRoutine.dynamic(

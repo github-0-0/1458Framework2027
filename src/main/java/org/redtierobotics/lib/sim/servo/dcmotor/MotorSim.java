@@ -7,10 +7,12 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import org.redtierobotics.lib.sim.servo.ServoSim;
 import org.redtierobotics.lib.sim.servo.ServoSimState;
 
+/** Simulates a motor, or any similar linear subsystem */
 public class MotorSim implements ServoSim<MotorSimState> {
 	private DCMotorSim sim;
 	private MotorSimState state;
 
+	/** Constructs an MotorSim from the wpilib equivalent */
 	public MotorSim(DCMotorSim sim) {
 		this.sim = sim;
 		state = new MotorSimState();

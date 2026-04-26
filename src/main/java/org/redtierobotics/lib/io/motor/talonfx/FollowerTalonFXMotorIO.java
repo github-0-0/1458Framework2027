@@ -14,9 +14,13 @@ import org.redtierobotics.lib.util.CanDevice;
 import org.redtierobotics.lib.util.CtreUtil;
 
 public class FollowerTalonFXMotorIO extends TalonFXMotorIO {
+	/** Creates a follower talon FX. It follows the main device. */
 	public FollowerTalonFXMotorIO(
-			CanDevice device, CanDevice main, MotorAlignmentValue alignmentValue) {
-		super(device, new TalonFXConfiguration());
+			CanDevice device,
+			CanDevice main,
+			MotorAlignmentValue alignmentValue,
+			TalonFXConfiguration config) {
+		super(device, config);
 		CtreUtil.applyFollower(main.id(), motor, alignmentValue);
 	}
 
