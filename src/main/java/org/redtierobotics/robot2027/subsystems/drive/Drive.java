@@ -180,6 +180,7 @@ public class Drive extends LoggedSubsystemBase {
 								.debounce(DEBOUNCE_TIME.in(Seconds)));
 	}
 
+	/** Uses PID to guide the drivetrain to a position */
 	public Command autoAlign(Pose2d pose) {
 		PIDVController translationController = new PIDVController(TRANSLATION_CONSTANTS);
 		ProfiledPIDVController thetaController =
@@ -244,6 +245,7 @@ public class Drive extends LoggedSubsystemBase {
 								.debounce(DEBOUNCE_TIME.in(Seconds)));
 	}
 
+	/** Follows a trajectory until its time is up */
 	public Command trajectory(RedTrajectory trajectory) {
 		var xController = new PIDVController(TRANSLATION_CONSTANTS);
 		var yController = new PIDVController(TRANSLATION_CONSTANTS);
@@ -314,7 +316,12 @@ public class Drive extends LoggedSubsystemBase {
 
 							request.withSpeeds(speeds);
 						})
-				.until(new Trigger(() -> trajectory.isDone()).debounce(DEBOUNCE_TIME.in(Seconds)));
+				.until(() -> trajectory.isDone());
+	}
+
+	/** Follows a trajectory, then aligns to its final pose */
+	public Command trajectoryWithFinalPID(RedTrajectory trajectory) {
+		return trajectory(trajectory).andThen(autoAlign(trajectory.getFinalState().pose));
 	}
 
 	/** Locks the robot onto a pose. Utilizes feedforwards derived from the current chassis speeds */

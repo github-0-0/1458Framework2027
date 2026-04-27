@@ -1,6 +1,7 @@
 package org.redtierobotics.lib.subsystembases.complex.weightedstatemachine;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -87,11 +88,40 @@ public abstract class WeightedStateMachineSubsystemBase extends CompositeSubsyst
 		}
 	}
 
+	/**
+	 * Quickly connect all states with a map of commands
+	 *
+	 * @param interconnector Maps 2 states to its command
+	 * @param states The states to connect
+	 */
+	public void interconnectSingleSided(
+			BiFunction<State, State, Pair<Supplier<Command>, Double>> interconnector,
+			State from,
+			State... states) {
+		for (int i = 0; i < states.length; i++) {
+			addStateTransition(
+					from,
+					states[i],
+					interconnector.apply(from, states[i]).getFirst(),
+					interconnector.apply(from, states[i]).getSecond());
+		}
+	}
+
 	/** A command that uses the fastest available path to the target state */
 	public Command state(State state) {
 		return defer(
 				() -> {
 					var path = stateMachine.findPath(stateMachine.getState().node(), state.node());
+					if (path == null) {
+						DriverStation.reportWarning(
+								"No path found between "
+										+ stateMachine.current.toString()
+										+ " and "
+										+ state.toString(),
+								true);
+						return Commands.none();
+					}
+
 					Command[] commands = new Command[path.size()];
 					int i = 0;
 					for (Pair<StateNode, StateEdge> step : path) {

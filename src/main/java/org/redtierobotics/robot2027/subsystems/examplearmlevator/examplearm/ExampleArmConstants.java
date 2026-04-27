@@ -22,6 +22,7 @@ import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.MomentOfInertiaUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -34,10 +35,27 @@ import org.redtierobotics.lib.sim.servo.arm.ArmSim;
 import org.redtierobotics.lib.util.CanDevice;
 
 public class ExampleArmConstants {
-	public static record ArmSetpoint(Angle armAngle) {
-		public static final ArmSetpoint HIGH = new ArmSetpoint(Degrees.of(45));
-		public static final ArmSetpoint MID = new ArmSetpoint(Degrees.of(0));
-		public static final ArmSetpoint LOW = new ArmSetpoint(Degrees.of(-45));
+	public static class ArmSetpoint {
+		public static final ArmSetpoint L23_PRESCORE = of(Degrees, 55);
+		public static final ArmSetpoint L23_POSTSCORE = of(Degrees, 30);
+		public static final ArmSetpoint L4_PRESCORE = of(Degrees, 23);
+		public static final ArmSetpoint L4_POSTSCORE = of(Degrees, 0);
+
+		public static final ArmSetpoint STOW = of(Degrees, 90);
+
+		public final Angle armAngle;
+
+		public static ArmSetpoint of(AngleUnit unit, double magnitude) {
+			return new ArmSetpoint(unit.of(magnitude));
+		}
+
+		public ArmSetpoint(Angle armAngle) {
+			this.armAngle = armAngle;
+		}
+
+		public Angle armAngle() {
+			return armAngle;
+		}
 	}
 
 	public static final CanDevice DEVICE = CanDevice.fromId(20);
@@ -48,7 +66,7 @@ public class ExampleArmConstants {
 	public static final AngularVelocity MAX_SPEED = DegreesPerSecond.of(300);
 	public static final AngularAcceleration MAX_ACCEL = DegreesPerSecondPerSecond.of(800);
 
-	public static final Angle MAX_ANGLE = Degrees.of(50);
+	public static final Angle MAX_ANGLE = Degrees.of(270);
 	public static final Angle MIN_ANGLE = Degrees.of(-90);
 	public static final Angle STARTING_ANGLE = Degrees.of(10);
 

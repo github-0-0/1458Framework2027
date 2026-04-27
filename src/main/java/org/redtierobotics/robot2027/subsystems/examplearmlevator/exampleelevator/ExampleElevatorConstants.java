@@ -21,6 +21,7 @@ import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -33,12 +34,20 @@ import org.redtierobotics.lib.util.CanDevice;
 
 public class ExampleElevatorConstants {
 	public static class ElevatorSetpoint {
-		public static final ElevatorSetpoint HIGH = new ElevatorSetpoint(Inches.of(50));
-		public static final ElevatorSetpoint MID = new ElevatorSetpoint(Inches.of(30));
-		public static final ElevatorSetpoint LOW = new ElevatorSetpoint(Inches.of(0));
+		public static final ElevatorSetpoint ZERO = of(Inches, 0);
+		public static final ElevatorSetpoint L2_PRESCORE = of(Inches, 7);
+		public static final ElevatorSetpoint L2_POSTSCORE = of(Inches, 6);
+		public static final ElevatorSetpoint L3_PRESCORE = of(Inches, 23);
+		public static final ElevatorSetpoint L3_POSTSCORE = of(Inches, 18);
+		public static final ElevatorSetpoint L4_PRESCORE = of(Inches, 62);
+		public static final ElevatorSetpoint L4_POSTSCORE = of(Inches, 47);
 
 		public final Distance elevatorHeight;
 		public final Angle rotations;
+
+		public static ElevatorSetpoint of(DistanceUnit unit, double magnitude) {
+			return new ElevatorSetpoint(unit.of(magnitude));
+		}
 
 		public ElevatorSetpoint(Distance elevatorHeight) {
 			this.elevatorHeight = elevatorHeight;

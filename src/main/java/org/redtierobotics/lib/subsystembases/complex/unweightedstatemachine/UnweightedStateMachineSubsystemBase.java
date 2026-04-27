@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -72,6 +75,46 @@ public abstract class UnweightedStateMachineSubsystemBase extends CompositeSubsy
 							interconnector.apply(states[j], states[i]));
 				}
 			}
+		}
+	}
+
+	/**
+	 * Quickly connect all states with a map of commands
+	 *
+	 * @param interconnector Maps 2 states to its command
+	 * @param states The states to connect
+	 */
+	public void interconnectSingleSided(
+			BiFunction<State, State, Supplier<Command>> interconnector,
+			Set<State> fromSet,
+			Set<State> toSet) {
+		if (!Collections.disjoint(fromSet, toSet)) {
+			throw new IllegalArgumentException("Sets must be disjoint to prevent a cycle");
+		}
+
+		for (State from : fromSet) {
+			for (State to : toSet) {
+				addStateTransition(from, to, interconnector.apply(from, to));
+			}
+		}
+	}
+
+	/**
+	 * Quickly connect all states with a map of commands
+	 *
+	 * @param interconnector Maps 2 states to its command
+	 * @param states The states to connect
+	 */
+	public void interconnectSingleSided(
+			BiFunction<State, State, Supplier<Command>> interconnector, State from, State... states) {
+		for (int i = 0; i < states.length; i++) {
+			addStateTransition(from, states[i], interconnector.apply(from, states[i]));
+		}
+	}
+
+	public void connectAll(BiFunction<State, State, Supplier<Command>> interconnector, Map<State, State> states) {
+		for (var pair : states.entrySet()) {
+			addStateTransition(pair.getKey(), pair.getValue(), interconnector.apply(pair.getKey(), pair.getValue()));
 		}
 	}
 

@@ -1,9 +1,9 @@
 package org.redtierobotics.robot2027;
 
 import static org.redtierobotics.robot2027.Robot.subsystems;
+import static org.redtierobotics.robot2027.subsystems.examplearmlevator.ExampleArmlevator.ArmlevatorState.*;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import org.redtierobotics.robot2027.subsystems.examplearmlevator.ExampleArmlevator.ArmlevatorState;
 
 public class Operator {
 	public final CommandXboxController controller;
@@ -21,7 +21,9 @@ public class Operator {
 	}
 
 	public void bindTeleop() {
-		controller.a().onTrue(subsystems.armlevator.state(ArmlevatorState.STOW));
-		controller.b().onTrue(subsystems.armlevator.state(ArmlevatorState.POST_SCORE));
+		controller.a().onTrue(subsystems.armlevator.state(STOW));
+		controller.b().onTrue(subsystems.armlevator.state(L2_POSTSCORE));
+		controller.x().onTrue(subsystems.armlevator.state(L3_POSTSCORE));
+		controller.y().onTrue(subsystems.armlevator.state(L4_POSTSCORE));
 	}
 }

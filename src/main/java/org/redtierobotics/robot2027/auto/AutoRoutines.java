@@ -6,5 +6,5 @@ import org.redtierobotics.robot2027.auto.AutoSelector.Auto;
 
 public final class AutoRoutines {
 	@Auto(name = "Hello World")
-	public static Command helloWorldAuto = Commands.print("Hello world");
+	public static final Command helloWorldAuto = Commands.print("Hello world");
 }
